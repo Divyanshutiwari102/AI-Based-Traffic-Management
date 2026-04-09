@@ -15,6 +15,13 @@
 > **An intelligent traffic signal control system that uses real-time multi-class vehicle detection with class-weighted density scoring and a Webster-constrained Genetic Algorithm to dynamically optimize green-phase durations — reducing average waiting time by up to 51% over fixed-time controllers.**
 
 <br/>
+## 📸 Screenshots
+
+![1](AI-Based-Traffic-Management/screenshots/1.png)<br/><br/>
+![2](AI-Based-Traffic-Management/screenshots/2.png)<br/><br/>
+![3](AI-Based-Traffic-Management/screenshots/3.png)
+
+
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
