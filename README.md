@@ -15,17 +15,18 @@
 > **An intelligent traffic signal control system that uses real-time multi-class vehicle detection with class-weighted density scoring and a Webster-constrained Genetic Algorithm to dynamically optimize green-phase durations — reducing average waiting time by up to 51% over fixed-time controllers.**
 
 <br/>
-
 ## 📸 Screenshots
 
-![1](/AI-Based-Traffic-Management/screenshots/1.png)<br/><br/>
-![2](/AI-Based-Traffic-Management/screenshots/2.png)<br/><br/>
-![3](/AI-Based-Traffic-Management/screenshots/3.png)
+![1](screenshots/1.png)<br/><br/>
+![2](screenshots/2.png)<br/><br/>
+![3](screenshots/3.png)
+
+
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
 │                                                                     │
-│   📷 Camera Feed  →  🤖 YOLOv8 Detection  →  ⚖️ Weighted Density   │
+│   📷 Camera Feed  →  🤖 YOLOv4 Detection  →  ⚖️ Weighted Density   │
 │                                                    ↓                │
 │   🚦 Signal Update  ←  🧬 Webster GA Optimizer  ←  📊 Pressure Score │
 │                                                                     │
@@ -83,7 +84,7 @@ The system is validated across three traffic density scenarios (Low / Medium / H
 ├──────────────────────────────────────────────────────────────────────────┤
 │                                                                          │
 │  ┌───────────┐    ┌──────────────────┐    ┌────────────────────────┐    │
-│  │  Camera   │───▶│  YOLOv8n Model   │───▶│  Multi-Class Detection │    │
+│  │  Camera   │───▶│  YOLOv4n Model   │───▶│  Multi-Class Detection │    │
 │  │  Feed     │    │  (18ms/frame)    │    │  car, bike, bus, truck │    │
 │  └───────────┘    └──────────────────┘    └───────────┬────────────┘    │
 │                                                       │                  │
@@ -131,7 +132,7 @@ The system is validated across three traffic density scenarios (Low / Medium / H
 ┌─────────────────────────────────────────────────────┐
 │  Core AI/ML          │  Optimization   │  Simulation │
 │  ─────────────────── │  ─────────────  │  ─────────  │
-│  YOLOv8 (Ultralytics)│  Genetic Algo   │  Python sim │
+│  YOLOv4 (Ultralytics)│  Genetic Algo   │  Python sim │
 │  OpenCV              │  Webster Formula│  NumPy      │
 │  PyTorch             │  SciPy          │  Matplotlib │
 └─────────────────────────────────────────────────────┘
