@@ -582,7 +582,7 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 
 <div align="center">
 
-**Made with ❤️ by [Divyanshu Tiwari](https://github.com/Divyanshutiwari102)**
+**Made with  by [Divyanshu Tiwari](https://github.com/Divyanshutiwari102)**
 
 ⭐ If this project helped you, please consider giving it a star!
 
