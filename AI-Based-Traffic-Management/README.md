@@ -26,7 +26,7 @@
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
 │                                                                     │
-│   📷 Camera Feed  →  🤖 YOLOv8 Detection  →  ⚖️ Weighted Density   │
+│   📷 Camera Feed  →  🤖 YOLOv4 Detection  →  ⚖️ Weighted Density   │
 │                                                    ↓                │
 │   🚦 Signal Update  ←  🧬 Webster GA Optimizer  ←  📊 Pressure Score │
 │                                                                     │
@@ -84,7 +84,7 @@ The system is validated across three traffic density scenarios (Low / Medium / H
 ├──────────────────────────────────────────────────────────────────────────┤
 │                                                                          │
 │  ┌───────────┐    ┌──────────────────┐    ┌────────────────────────┐    │
-│  │  Camera   │───▶│  YOLOv8n Model   │───▶│  Multi-Class Detection │    │
+│  │  Camera   │───▶│  YOLOv4n Model   │───▶│  Multi-Class Detection │    │
 │  │  Feed     │    │  (18ms/frame)    │    │  car, bike, bus, truck │    │
 │  └───────────┘    └──────────────────┘    └───────────┬────────────┘    │
 │                                                       │                  │
@@ -132,7 +132,7 @@ The system is validated across three traffic density scenarios (Low / Medium / H
 ┌─────────────────────────────────────────────────────┐
 │  Core AI/ML          │  Optimization   │  Simulation │
 │  ─────────────────── │  ─────────────  │  ─────────  │
-│  YOLOv8 (Ultralytics)│  Genetic Algo   │  Python sim │
+│  YOLOv4 (Ultralytics)│  Genetic Algo   │  Python sim │
 │  OpenCV              │  Webster Formula│  NumPy      │
 │  PyTorch             │  SciPy          │  Matplotlib │
 └─────────────────────────────────────────────────────┘
