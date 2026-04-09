@@ -13,9 +13,43 @@ The Smart Adaptive Traffic Management System leverages AI and computer vision to
 
 
 ## ✨ Features
-- Vehicle Detection: Uses YOLOv4 for real-time vehicle detection from video feeds.
-- Traffic Optimization: Employs a genetic algorithm to determine optimal green light times based on vehicle counts.
-- Web Interface: Allows users to upload traffic videos, view processing results, and receive optimized traffic management recommendations.
+- Vehicle Detection: YOLOv8-first detector pipeline (with safe fallback) and weighted multi-class density.
+- Traffic Optimization: Webster-stabilized genetic optimizer using demand-ratio pressure (not inverted congestion).
+- Async Processing API: `/upload` returns a `job_id`; `/status/<job_id>` exposes processing state and final result.
+- Research-Ready Structure: Modular backend layout for detector, predictor, optimizer, metrics, and tasks.
+- Web Interface: Upload 4 videos, track processing, and view optimized timings.
+
+## 🧠 Architecture Diagram
+
+```text
+Cameras/Video Streams (N intersections)
+        │
+        ▼
+[Frame Sampler + ROI + Calibration]
+        │
+        ▼
+[Detector: YOLOv8] ──► [Tracker: DeepSORT/ByteTrack]
+        │                         │
+        └─► class counts          ├─► trajectories / queue / speed
+                  │               ▼
+                  └──────► [Feature Builder + Weighted Density]
+                                   │
+                                   ├─► [LSTM Predictor] -> short-horizon demand
+                                   ▼
+                         [State Constructor]
+                                   │
+                                   ▼
+                         [PPO Policy Agent]
+                                   │
+                                   ▼
+                     [GA/Webster Constraint Layer]
+                                   │
+                                   ▼
+                    [Signal Plan Executor / SUMO]
+                                   │
+                                   ▼
+                 [Metrics Service: AWT, queue, throughput, JFI]
+```
 
 ## 🚀 Getting Started
 
@@ -24,7 +58,7 @@ The Smart Adaptive Traffic Management System leverages AI and computer vision to
 - Python 3.x
 - Nodejs
 - OpenCV
-- YOLOv4 weights and configuration files
+- YOLOv8 model support (`ultralytics`) and PyTorch
 - Required Python packages (listed in requirements.txt)
 
 ## 💻 Local Setup
@@ -52,10 +86,10 @@ npm start
 ```
 
 Upload Traffic Videos: <br/>
-Use the web interface to upload 4 traffic videos. The system will process the videos and display optimized green light times based on the analysis.
+Use the web interface to upload 4 traffic videos. The backend returns a `job_id`, and the frontend polls status until optimized timings are ready.
 
 ## 🙏 Acknowledgments
 
-- YOLOv4: For vehicle detection.
+- YOLOv8 / Ultralytics: For vehicle detection.
 - OpenCV: For video processing.
-- Genetic Algorithm: For optimizing traffic light timings.
+- Genetic Algorithm + Webster constraints: For optimizing safe traffic light timings.

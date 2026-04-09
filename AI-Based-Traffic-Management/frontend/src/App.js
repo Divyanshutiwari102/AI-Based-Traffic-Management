@@ -6,6 +6,7 @@ function App() {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [jobId, setJobId] = useState(null);
 
   const handleFileChange = (e) => {
     // Convert FileList to array and set to state
@@ -29,14 +30,41 @@ function App() {
       const response = await axios.post('http://localhost:5000/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      setResult(response.data);
-      console.log(response);
-      setLoading(false);
+      setJobId(response.data.job_id);
     } catch (error) {
       console.error('Error uploading files:', error);
       setLoading(false);
     }
   };
+
+  React.useEffect(() => {
+    if (!jobId) return undefined;
+
+    const interval = setInterval(async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/status/${jobId}`);
+        const { state, result: payload, error } = response.data;
+        if (state === 'SUCCESS') {
+          setResult(payload.timings || payload);
+          setLoading(false);
+          setJobId(null);
+          clearInterval(interval);
+        } else if (state === 'FAILURE') {
+          setResult({ error: error || 'Processing failed' });
+          setLoading(false);
+          setJobId(null);
+          clearInterval(interval);
+        }
+      } catch (error) {
+        setResult({ error: 'Unable to fetch job status' });
+        setLoading(false);
+        setJobId(null);
+        clearInterval(interval);
+      }
+    }, 1500);
+
+    return () => clearInterval(interval);
+  }, [jobId]);
 
   return (
     <div className="App">

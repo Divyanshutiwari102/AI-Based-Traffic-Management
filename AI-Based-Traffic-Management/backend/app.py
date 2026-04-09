@@ -1,39 +1,41 @@
-from flask import Flask, request, jsonify
+from __future__ import annotations
+
+from pathlib import Path
+
+from flask import Flask, jsonify, request
 from flask_cors import CORS
-import os
-from yolov4 import detect_cars
-from algo import optimize_traffic
+from werkzeug.utils import secure_filename
+
+from config import CORS_ORIGIN, MAX_UPLOAD_VIDEOS, UPLOAD_DIR
+from tasks import get_task_status, process_videos_task
 
 app = Flask(__name__)
-CORS(app)
-
-
-def enumerate(files):
-    pass
+CORS(app, resources={r"/*": {"origins": CORS_ORIGIN}})
 
 
 @app.route('/upload', methods=['POST'])
 def upload_files():
     files = request.files.getlist('videos')
-    if len(files) != 4:
-        return jsonify({'error': 'Please upload exactly 4 videos'}), 400
+    if len(files) != MAX_UPLOAD_VIDEOS:
+        return jsonify({'error': f'Exactly {MAX_UPLOAD_VIDEOS} videos required'}), 400
 
     video_paths = []
     for i, file in enumerate(files):
-        video_path = os.path.join('uploads', f'video_{i}.mp4')
-        file.save(video_path)
-        video_paths.append(video_path)
+        filename = secure_filename(file.filename or f'video_{i}.mp4')
+        output_path = Path(UPLOAD_DIR) / f'{i}_{filename}'
+        file.save(str(output_path))
+        video_paths.append(str(output_path))
 
-    num_cars_list = []
-    for video_file in video_paths:
-        num_cars = detect_cars(video_file)
-        num_cars_list.append(num_cars)
+    job = process_videos_task.delay(video_paths)
+    return jsonify({'job_id': job.id}), 202
 
-    result = optimize_traffic(num_cars_list)
 
-    return jsonify(result)
+@app.route('/status/<job_id>', methods=['GET'])
+def get_status(job_id: str):
+    status = get_task_status(job_id)
+    return jsonify(status), (404 if status.get("state") == "NOT_FOUND" else 200)
+
 
 if __name__ == '__main__':
-    if not os.path.exists('uploads'):
-        os.makedirs('uploads')
+    UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
     app.run(debug=True)
