@@ -1,12 +1,19 @@
 from __future__ import annotations
 
 from collections import Counter, deque
+from pathlib import Path
 from typing import Dict, List, Optional
 
 import cv2 as cv
 import numpy as np
 
-from config import MODEL_PATH
+from config import (
+    CLASS_NAMES_PATH,
+    DEFAULT_MAX_VIDEO_FRAMES,
+    LEGACY_YOLO_CONFIG,
+    LEGACY_YOLO_WEIGHTS,
+    MODEL_PATH,
+)
 
 VEHICLE_CLASSES = {2: "car", 3: "motorcycle", 5: "bus", 7: "truck", 0: "person"}
 WEIGHTS = {"car": 1.0, "motorcycle": 0.5, "bus": 2.0, "truck": 1.5, "person": 0.3}
@@ -58,12 +65,15 @@ def _legacy_detect_cars(video_file: str) -> float:
     conf_threshold = 0.4
     nms_threshold = 0.4
 
-    net = cv.dnn.readNet('yolov4-tiny.weights', 'yolov4-tiny.cfg')
+    net = cv.dnn.readNet(LEGACY_YOLO_WEIGHTS, LEGACY_YOLO_CONFIG)
     model = cv.dnn_DetectionModel(net)
     model.setInputParams(size=(416, 416), scale=1 / 255, swapRB=True)
 
     class_names = []
-    with open('classes.txt', 'r', encoding='utf-8') as file:
+    class_file = Path(CLASS_NAMES_PATH)
+    if not class_file.exists():
+        return 0.0
+    with class_file.open('r', encoding='utf-8') as file:
         class_names = [name.strip() for name in file.readlines()]
 
     cap = cv.VideoCapture(video_file)
@@ -90,7 +100,7 @@ def _legacy_detect_cars(video_file: str) -> float:
     return float(np.mean(car_counts))
 
 
-def detect_video(video_file: str, max_frames: Optional[int] = 120) -> Dict[str, int]:
+def detect_video(video_file: str, max_frames: Optional[int] = DEFAULT_MAX_VIDEO_FRAMES) -> Dict[str, int]:
     cap = cv.VideoCapture(video_file)
     aggregate_counts: Counter[str] = Counter()
     frame_index = 0

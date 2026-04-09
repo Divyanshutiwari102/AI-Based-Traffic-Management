@@ -4,10 +4,11 @@ import uuid
 from concurrent.futures import Future, ThreadPoolExecutor
 from dataclasses import dataclass
 
+from config import MAX_TASK_WORKERS
 from optimizer.ga_optimizer import optimize_traffic
 from services.video_service import process_videos
 
-_EXECUTOR = ThreadPoolExecutor(max_workers=2)
+_EXECUTOR = ThreadPoolExecutor(max_workers=MAX_TASK_WORKERS)
 _TASKS: dict[str, Future] = {}
 
 

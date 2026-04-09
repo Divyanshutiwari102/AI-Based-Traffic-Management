@@ -2,7 +2,19 @@ from __future__ import annotations
 
 import numpy as np
 
+from config import (
+    EPSILON,
+    GA_BETA,
+    GA_CYCLE_TIME,
+    GA_GREEN_MAX,
+    GA_GREEN_MIN,
+    GA_MAX_ITER,
+    GA_MUTATION_RATE,
+    GA_POP_SIZE,
+)
+
 ROAD_CAPACITY_DEFAULT = 20
+DEMAND_ADJUSTMENT_FACTOR = 0.9
 
 
 def lane_pressure(counts: dict[str, int], capacity: int) -> float:
@@ -15,14 +27,14 @@ def _webster_lane_delay(green: float, cycle: float, demand: float, sat_flow: flo
     if sat_flow <= 0 or green <= 0 or cycle <= 0:
         return float("inf")
 
-    q = max(demand * 0.9, 1e-9)
+    q = max(demand * DEMAND_ADJUSTMENT_FACTOR, EPSILON)
     g_over_c = green / cycle
     max_g_over_c = 0.99 * sat_flow / q
     if g_over_c >= max_g_over_c:
         g_over_c = max(max_g_over_c, 1e-6)
 
     denominator = 2 * (1 - (g_over_c * q / sat_flow))
-    if denominator <= 1e-9:
+    if denominator <= EPSILON:
         return float("inf")
 
     delay = (cycle * (1 - g_over_c) ** 2) / denominator
@@ -72,8 +84,8 @@ def mutate(individual, mutation_rate, green_min, green_max):
     mutations = max(1, int(mutation_rate * num_lights))
     for _ in range(mutations):
         idx = np.random.randint(0, num_lights)
-        sigma = np.random.choice([-1, 1]) * 0.05 * (green_max - green_min)
-        mutated[idx] = np.clip(mutated[idx] + sigma, green_min, green_max)
+        delta = np.random.choice([-1, 1]) * 0.05 * (green_max - green_min)
+        mutated[idx] = np.clip(mutated[idx] + delta, green_min, green_max)
     return mutated
 
 
@@ -93,7 +105,6 @@ def genetic_algorithm(pop_size, num_lights, max_iter, green_min, green_max, cycl
 
             for child in (child1, child2):
                 child = mutate(child, mutation_rate, green_min, green_max)
-                child = np.clip(child, green_min, green_max)
                 if np.sum(child) <= cycle_time:
                     score = fitness(child, density_vector, ROAD_CAPACITY_DEFAULT)
                     new_population.append((child, score))
@@ -109,14 +120,14 @@ def genetic_algorithm(pop_size, num_lights, max_iter, green_min, green_max, cycl
 
 
 def optimize_traffic(densities):
-    pop_size = 250
+    pop_size = GA_POP_SIZE
     num_lights = 4
-    max_iter = 20
-    green_min = 10
-    green_max = 60
-    cycle_time = 148
-    mutation_rate = 0.02
-    beta = 8
+    max_iter = GA_MAX_ITER
+    green_min = GA_GREEN_MIN
+    green_max = GA_GREEN_MAX
+    cycle_time = GA_CYCLE_TIME
+    mutation_rate = GA_MUTATION_RATE
+    beta = GA_BETA
 
     best_sol = genetic_algorithm(
         pop_size,

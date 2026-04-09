@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import './styles.css';
 
+const POLLING_INTERVAL_MS = 1500;
+
 function App() {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [result, setResult] = useState(null);
@@ -38,7 +40,7 @@ function App() {
   };
 
   React.useEffect(() => {
-    if (!jobId) return undefined;
+    if (!jobId) return;
 
     const interval = setInterval(async () => {
       try {
@@ -56,12 +58,13 @@ function App() {
           clearInterval(interval);
         }
       } catch (error) {
-        setResult({ error: 'Unable to fetch job status' });
+        const message = `Unable to fetch job status${error?.message ? `: ${error.message}` : ''}`;
+        setResult({ error: message });
         setLoading(false);
         setJobId(null);
         clearInterval(interval);
       }
-    }, 1500);
+    }, POLLING_INTERVAL_MS);
 
     return () => clearInterval(interval);
   }, [jobId]);
