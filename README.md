@@ -16,6 +16,12 @@
 
 <br/>
 
+## 📸 Screenshots
+
+![1](screenshots/1.png)<br/><br/>
+![2](screenshots/2.png)<br/><br/>
+![3](screenshots/3.png)
+
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
 │                                                                     │
